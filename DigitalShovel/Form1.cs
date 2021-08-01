@@ -66,6 +66,11 @@ namespace DigitalShovel
 			label_destination.Text = "No destination";
 			progressBar1.Value = 0;
 			label_progress.Text = "0 files / 0 files\n0 MB / 0 MB";
+			Shovel.currentFileWrites = 0;
+			Shovel.totalBytesCount = 0;
+			Shovel.totalBytesDone = 0;
+			Shovel.totalFilesCount = 0;
+			Shovel.totalFilesDone = 0;
 		}
 
 		private void button_start_Click(object sender, EventArgs e)

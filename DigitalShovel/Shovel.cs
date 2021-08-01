@@ -103,7 +103,6 @@ namespace DigitalShovel
 				{
 					long left = fsFrom.Length;
 
-					int flusher = 0;
 					while (left > 0)
 					{
 						if (blockSize > left) blockSize = (int)left;
@@ -114,13 +113,6 @@ namespace DigitalShovel
 
 						fsTo.Write(bytes, 0, blockSize);
 						
-						flusher++;
-						if(flusher > 16)
-						{
-							fsTo.Flush();
-							flusher = 0;
-						}
-
 						totalBytesDone += blockSize;
 						currentFileWrites += blockSize;
 						left -= blockSize;
