@@ -17,24 +17,21 @@ namespace DigitalShovel
 		public static long totalFilesDone = 0;
 
 		public static long currentFileWrites = 0;
+		
+		public static float progressBarValue = 0;
+		public static string progressText = "Waiting for start";
+		
+		public static bool finished = false;
 
-
-		private static Label m_progressLabel;
-		private static ProgressBar m_progressBar;
-
-
-		public static void Start(IEnumerable<string> files, string destination, Label progressLabel, ProgressBar progressBar)
+		public static void Start(IEnumerable<string> files, string destination)
 		{
-			m_progressLabel = progressLabel;
-			m_progressBar = progressBar;
+			progressText = "Started";
 
 			foreach (var item in files)
 			{
 				totalBytesCount += new FileInfo(item).Length;
 				totalFilesCount++;
 			}
-
-			RefreshUI();
 
 			foreach (var item in files)
 			{
@@ -57,51 +54,47 @@ namespace DigitalShovel
 						Copy(source.FullName, fileDestination);
 
 						totalFilesDone++;
-						RefreshUI();
 						success = true;
 					}
 					catch (Exception ex)
 					{
 						totalBytesDone -= currentFileWrites;
-						RefreshUI();
 						MessageBox.Show(ex.Message);
 						Thread.Sleep(5000);
 						
 						try
 						{
-							File.Delete(fileDestination);
-						}catch (Exception){}
+							if (File.Exists(fileDestination)) File.Delete(fileDestination);
+							if (File.Exists(fileDestination + ".part")) File.Delete(fileDestination + ".part");
+						}
+						catch (Exception){}
 					}
 
 					if (success) break;
 				}
 			}
 
-			RefreshUI(100);
+			progressBarValue = 100;
 
-			MessageBox.Show("Finished");
-		}
-
-		private static void RefreshUI(int val = 0)
-		{
-			m_progressBar.Value = val;
-			m_progressBar.Refresh();
-
-			m_progressLabel.Text = $"{totalFilesDone} files / {totalFilesCount} files\n{totalBytesDone / 1024 / 1024} MB / {totalBytesCount / 1024 / 1024} MB";
-			m_progressLabel.Refresh();
+			progressText = "Finished!";
+			finished = true;
 		}
 
 		private static void Copy(string from, string to)
 		{
-			int blockSize = 1 * 1024 * 1024;
+			int blockSize = 8 * 1024 * 1024;
 
 			byte[] bytes;
 
 			using (FileStream fsFrom = new FileStream(from, FileMode.Open, FileAccess.Read))
 			{
-				using (FileStream fsTo = File.Create(to))
+				using (FileStream fsTo = File.Create(to + ".part"))
 				{
 					long left = fsFrom.Length;
+
+					int i = 0;
+
+					progressText = "Copying";
 
 					while (left > 0)
 					{
@@ -110,20 +103,24 @@ namespace DigitalShovel
 						bytes = new byte[blockSize];
 
 						fsFrom.Read(bytes, 0, blockSize);
-
 						fsTo.Write(bytes, 0, blockSize);
-						
+						if (i % 100 == 0) fsTo.Flush();
+
 						totalBytesDone += blockSize;
 						currentFileWrites += blockSize;
 						left -= blockSize;
 
 						float newVal = ((float)(totalBytesDone / 1024 / 1024) / (float)(totalBytesCount / 1024 / 1024)) * 100;
 
-						RefreshUI((int)newVal);
+						progressBarValue = newVal;
+						i++;
 					}
+
+					progressText = "Waiting for disk";
 				}
 			}
 
+			File.Move(to + ".part", to);
 		}
 	}
 }

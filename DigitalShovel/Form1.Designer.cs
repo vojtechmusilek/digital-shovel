@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.label_ui456 = new System.Windows.Forms.Label();
 			this.label_ui1 = new System.Windows.Forms.Label();
@@ -41,6 +42,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.button_destination = new System.Windows.Forms.Button();
 			this.label_destination = new System.Windows.Forms.Label();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -130,9 +132,9 @@
 			this.label_progress.AutoSize = true;
 			this.label_progress.Location = new System.Drawing.Point(12, 261);
 			this.label_progress.Name = "label_progress";
-			this.label_progress.Size = new System.Drawing.Size(78, 30);
+			this.label_progress.Size = new System.Drawing.Size(78, 45);
 			this.label_progress.TabIndex = 1;
-			this.label_progress.Text = "0 files / 0 files\r\n0 MB / 0 MB";
+			this.label_progress.Text = "0 files / 0 files\r\n0 MB / 0 MB\r\n?";
 			// 
 			// label1
 			// 
@@ -162,12 +164,18 @@
 			this.label_destination.TabIndex = 5;
 			this.label_destination.Text = "No destination";
 			// 
+			// timer1
+			// 
+			this.timer1.Enabled = true;
+			this.timer1.Interval = 500;
+			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+			// 
 			// Form1
 			// 
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(292, 306);
+			this.ClientSize = new System.Drawing.Size(292, 316);
 			this.Controls.Add(this.label_destination);
 			this.Controls.Add(this.button_destination);
 			this.Controls.Add(this.label1);
@@ -205,6 +213,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button button_destination;
 		private System.Windows.Forms.Label label_destination;
+		private System.Windows.Forms.Timer timer1;
 	}
 }
 

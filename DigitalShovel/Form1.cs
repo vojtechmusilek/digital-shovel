@@ -29,6 +29,28 @@ namespace DigitalShovel
 			files = new List<string>();
 		}
 
+		int progressDots = 0;
+
+		private void UpdateUI()
+		{
+			if (Shovel.finished)
+			{
+				progressDots = 0;
+				timer1.Stop();
+			}
+
+			progressBar1.Value = (int)Shovel.progressBarValue;
+			progressBar1.Refresh();
+
+			label_progress.Text = 
+				$"{Shovel.totalFilesDone} files / {Shovel.totalFilesCount} files\n"+
+				$"{Shovel.totalBytesDone / 1024 / 1024} MB / {Shovel.totalBytesCount / 1024 / 1024} MB\n"+
+				$"{Shovel.progressText}{"".PadLeft(progressDots, '.')}";
+			label_progress.Refresh();
+
+			progressDots++;
+			if (progressDots > 3) progressDots = 0;
+		}
 
 
 		private void panel_DragDrop(object sender, DragEventArgs e)
@@ -75,10 +97,19 @@ namespace DigitalShovel
 
 		private void button_start_Click(object sender, EventArgs e)
 		{
+			button_start.Enabled = false;
+			button_reset.Enabled = false;
+			button_destination.Enabled = false;
+			panel1.AllowDrop = false;
+			panel1.Enabled = false;
+
 			if (files.Count == 0) { MessageBox.Show("no files"); return; }
 			if (destination == "") { MessageBox.Show("no destination"); return; }
 
-			Shovel.Start(files, destination, label_progress, progressBar1);
+			Task.Run(() =>
+			{
+				Shovel.Start(files, destination);
+			});
 		}
 
 		private void button_destination_Click(object sender, EventArgs e)
@@ -101,6 +132,11 @@ namespace DigitalShovel
 					label_destination.Text = vizDestination;
 				}
 			}
+		}
+
+		private void timer1_Tick(object sender, EventArgs e)
+		{
+			UpdateUI();
 		}
 	}
 }
